@@ -1,0 +1,136 @@
+/*Sensor de Temperatura y Humedad DHT11<br>Instrucciones:
+  Recuerda descargar la libreria DHT para poder utilizar este sensor
+  Conectaremos el Sensor DHT11 a 5v y el pin de señal a la entrada digital 7
+*/
+
+
+#define SSID "gabriel" //Nombre de la Red Wifi a la que nos conectamos
+#define PASS "Aa123456789" //Contraseña de la Red Wifi
+//#define IP "184.106.153.149" // thingspeak.com
+
+//Sustituir [WRITE_API_KEY] por la obtenida en thingspeak.com sin []
+
+
+
+void setup()
+{
+
+  //pinMode(13, OUTPUT);
+
+  //dht.begin(); //Se inicializa sensor DHT
+  Serial.begin(9600); //Se inicializa el puerto Serial para comunicarse con el Modulo Wifi ESP8266
+  Serial.setTimeout(3000); //Set el Timeout en 3 segundos para Serial.find()
+  Serial.println("AT\r"); //PROBAR CON \n\r
+
+  delay(2000);
+
+  if (Serial.find("OK")) { //Verificar si Modulo Wifi responde
+    if (!connectWiFi()) { //Conectarse a la red
+      Serial.println("NO SE PUDO CONECTAR A RED WIFI");
+    }
+  } else {
+    Serial.println("MODULO WIFI NO RESPONDE");
+  }
+}
+
+void loop() {
+  /*float h = dht.readHumidity(); // Lee la humedad
+    float t = dht.readTemperature(); //Lee la temperatura
+
+    char bufferTemp[8]; //Crear buffer temporal para convertir float a string
+    String temperatura = dtostrf(t, 8, 3, bufferTemp); //Convertir de float a String 8 = longitud de String, 3 = numero de decimales. (e.g. 1234.567)
+    updateTemp(temperatura); //Actualizar temperatura
+
+    digitalWrite(13,HIGH);
+    delay(20000); //Thingspeak nos pide un MINIMO de 15 segundos entre cada actualizacion
+    //Si se hace mas pronto no se captura el Dato. Esperar 20 para estar seguros
+
+    char bufferHum[8]; //Crear buffer temporal para convertir float a string
+    String humedad = dtostrf(h, 8, 2, bufferHum); //Convertir de float a string 8 = longitud de String, 3 = numero de decimales. (e.g. 1234.567)
+    updateHumedad(humedad); //Actualizar humedad
+    digitalWrite(13,LOW);
+    delay(20000); //Hacer una medicion cada 20 segundos
+    }
+
+    void updateTemp(String temp){
+
+    String cmd = "AT+CIPSTART=\"TCP\",\""; //Crear el comando para comenzar una conexion TCP
+    cmd += IP; //IP del sitio a conectarse (thingspeak.com)
+    cmd += "\",80"; //Puerto (80)
+    Serial.println(cmd); //Crear conexion
+    delay(2000); //Darle 2 segundos para responder
+
+
+    if(Serial.find("ERROR")){
+     return; //No se pudo conectar
+    }
+
+    temp.trim(); //Remover espacios e.g. "____30.00" >> "30.00"
+
+    cmd = GET_TEMP; //Crear datos a enviar
+    cmd += temp; //Agregar la temperatura leida
+    cmd += "\r\n"; //Agregar caracteres de newline y Carriage return
+
+    Serial.print("AT+CIPSEND="); //Indicar cuantos datos se enviaran por TCP
+    Serial.println(cmd.length()); //Tamaño de los datos a enviar por TCP
+
+    delay(2000);
+
+    if(Serial.find(">")){
+     Serial.print(cmd); //Enviar datos
+    }else{
+     Serial.println("AT+CIPCLOSE"); //No se pudo ejecutar, cerrar conexion TCP
+    }
+    }
+
+    void updateHumedad(String humedad){
+    String cmd = "AT+CIPSTART=\"TCP\",\"";
+    cmd += IP;
+    cmd += "\",80";
+    Serial.println(cmd);
+    delay(2000);
+
+    if(Serial.find("ERROR")){
+     return;
+    }
+
+    humedad.trim();
+
+    cmd = GET_HUM;
+    cmd += humedad;
+    cmd += "\r\n";
+    Serial.print("AT+CIPSEND=");
+    Serial.println(cmd.length());
+
+    delay(2000);
+
+    if(Serial.find(">")){
+     Serial.print(cmd);
+    }else{
+     Serial.println("AT+CIPCLOSE");
+    }*/
+}
+
+//Funcion para crear conexion Wifi. Regresa true si se conecta exitosamente, si no false.
+boolean connectWiFi() {
+
+  Serial.println("AT+CWMODE=3"); //Configurar Modulo Wifi ESP8266 en Modo 3 = Station + Access Point (Trasmitir y Recibir)
+  delay(2000); //Darle tiempo para ejecutar comando
+
+  String cmd = "AT+CWJAP=\""; //
+  cmd += SSID;
+  cmd += "\",\"";
+  cmd += PASS;
+  cmd += "\"";
+
+  //cmd = AT+CWJAP="SSID","PASS"
+
+  Serial.println(cmd);
+  delay(10000); //Darle 10 segundos para conectarse
+
+  if (Serial.find("OK")) {
+    return true; //Conexión existosa
+  } else {
+    return false; //No se pudo conectar
+  }
+}
